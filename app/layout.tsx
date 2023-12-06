@@ -13,7 +13,7 @@ export default function RootLayout({
       >
         {children}
         <footer className="flex h-20 items-center justify-center bg-gray-100">
-          Hecho con amor por la gente de Vercel
+          NextJS 14 Vercel
         </footer>
       </body>
     </html>
