@@ -3,6 +3,9 @@
 
 import { z } from 'zod';
 import { Invoice } from './definitions';
+import { sql } from '@vercel/postgres';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 // Definiendo un esquema para validar los datos que recibimos del cliente.
 const CreateInvoiceSchema = z.object({
@@ -35,11 +38,18 @@ export async function createInvoice(formData: FormData) {
   //Creando Fecha Actual.
   const [date] = new Date().toISOString().split('T');
 
-  //console.log(customerId, amountInCents, status, date);
+  //console.log({ customerId, amountInCents, status, date });
 
   //insertando un nuevo Invoice en la base de datos.
+
   await sql`
-  INSERT INTO invoices (customer_id, amount, status, date)
-  VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-  `;
+INSERT INTO invoices (customer_id, amount, status, date)
+VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+`;
+
+  //revalidando la ruta para que se actualice el cache.
+  revalidatePath('/dashboard/invoices');
+
+  //Redireccionando al usuario a la misma ruta para ver cuando el usuario haya creado algo nuevo.
+  redirect('/dashboard/invoices');
 }
